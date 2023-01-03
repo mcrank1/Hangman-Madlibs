@@ -1,0 +1,239 @@
+import java.io.*;
+import java.util.*;
+
+public class HangmanMadlibFinal {
+    public static void main(String[] args) throws FileNotFoundException {
+        chooseGame();
+
+    }
+
+    public static void chooseGame() {
+        Scanner console = new Scanner(System.in);
+        System.out.println("Welcome to Icy Word Wonders! \n\nIf you would like to play Madlibs, please enter 1. If you would like to play Hangman, please enter 2.");
+
+        System.out.print("\nPlease enter the number of which game you would like to play: ");
+        String userChoice;
+        userChoice = console.nextLine();
+
+
+        if (userChoice.equals("1")) {
+            madLibs();
+        }
+        if (userChoice.equals("2")) {
+            hangman();
+
+        }
+    }
+
+    /* Using the ReadFileIntoArray Example to start getting an idea */
+
+    public static String[] readFileIntoArray(String fileName) {
+        File file = null;
+        Scanner170 scanFile = null;
+        if (fileName == null) {
+            return new String[0];
+        }
+        try {
+            file = CheckIO.findFile(fileName);
+            scanFile = new Scanner170(file);
+
+            int lineCount = 0;
+            while (scanFile.hasNextLine()) {
+                scanFile.nextLine();
+                lineCount++;
+            }
+            scanFile.close();
+
+            String[] fileArray = new String[lineCount];
+            scanFile = new Scanner170(file);
+            for (int i = 0; i < fileArray.length; i++) {
+                fileArray[i] = scanFile.nextLine();
+            }
+
+            scanFile.close();
+            return fileArray;
+        } catch (FileNotFoundException fnfe) {
+            return new String[0];
+        }
+    }
+
+    public static void hangman() {
+        System.out.println("Welcome to Hangman!");
+        String[] array = readFileIntoArray("hangmanwords.txt");
+        String chosenWord = array[(int) (Math.random() * array.length)]; //will give a random index in array, don't want a double so convert to int
+        System.out.println("__________________________\n");
+        //System.out.println(chosenWord); //remove this from final program, just shows me that words are being randomized correctly
+        int numGuesses = 6; //6 body parts only, or we could consider randomized number
+        hangmanGuesses(chosenWord, numGuesses);
+        playAgain();
+
+    }
+
+    public static void hangmanGuesses(String word, int guesses) { //method that will actually process guesses and tell if user wins
+        char userGuess; //just declare until given value in loop
+        char[] guessedLetters = new char[word.length()]; //array length of user guesses can't be any bigger than the chosen word
+        for (int i = 0; i < guessedLetters.length; i++) { //this will be the loop used to put symbols in place of the letters that haven't been guessed
+            guessedLetters[i] = '_';
+        }
+
+        Scanner sc = new Scanner(System.in);
+
+        while (guesses > 0) {
+            System.out.println("\nRemaining guesses: " + guesses);
+            boolean youWin = true; //also declaring this boolean because game needs to end at certain point, making it true so it can be set to false depending on later condition
+            boolean correctLetter = false; //initializing a boolean so we can set it to true when a user guesses the right letter, I set it to false because one of the if statements doesn't work otherwise
+            System.out.println("\nEnter your letter guess: "); //relocated this so it prompts user each time
+            userGuess = Console.nextChar();
+
+            for (int k = 0; k < word.length(); k++) { //in this loop, we'll be individually checking each letter in the word to see if the user guess matches
+                char wordCheck = word.charAt(k); //as we move through loop, charAt is checking characters at each index
+                //note:separately declared wordCheck so we can use it in if statements to see if it matches the character entered by user
+                if (wordCheck == userGuess) { //if the two characters match/user correctly guesses
+                    guessedLetters[k] = wordCheck;  //updating array so that correctly guessed letters are stored
+                    correctLetter = true;
+                }
+            }
+            //we now need a separate set of test conditions so that any wrong guesses decreases remaining guesses, also needed for possible picture
+            if (!correctLetter) { //if the Boolean is still false
+                guesses = guesses - 1; //decrement set guesses by 1, once this hits 0 while loop stops
+            }
+            for (int j = 0; j < guessedLetters.length; j++) { //user can see how many letters they're guessing, moved this inside while loop so it displays each time
+                if (guessedLetters[j] == '_') { //this is where I'm setting the game over condition
+                    youWin = false; //so long as there are still blank spaces in the word, the user cannot win and thus the boolean is false
+                }
+                System.out.print(guessedLetters[j]); //actually shows what word looks like so far
+            }
+            if (youWin) {
+                System.out.println("\nCongrats, you found the word!");
+                break; //breaking the loop in case user wins game
+            }
+            if (guesses == 0) {
+                System.out.println("\nSorry, " + word + " is the word.");
+            }
+
+
+        }
+
+
+    }
+
+
+    public static void playAgain() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Would you like to play Hangman again? Enter yes or no.\nInvalid input will automatically close game.");
+        String yes = "yes";
+        String no = "no";
+        String userInput = Console.nextLine();
+        if (userInput.equals(yes.toUpperCase()) || userInput.equals(yes.toLowerCase())) { //trying to make it accept either lower or upper case input
+            hangman();
+        } else if (userInput.equals(no.toUpperCase()) || userInput.equals(no.toLowerCase())) { //same thing here but opposite condition
+            System.out.println("Thanks for playing! Exiting game.");
+        } else {
+            System.out.println("Invalid input. Game closing automatically.");
+        }
+
+
+    }
+
+
+
+
+
+
+        /* The method that will store the words guessed in a file
+        and express them as an array. For now going to have the code just
+        print out the words in the file. */
+
+        /*Scanner input = new Scanner(CheckIO.findFile("hangmanwords.txt"));
+        /* below is the code that will read the file as an array and randomize
+        the words as an integer through the array int.
+        int wordIndex = rand.nextInt(wordArray.length;
+        String randomWord = wordArray[wordIndex];
+
+        while (input.hasNextLine()) {
+            String text = input.nextLine();
+            System.out.println(text.toUpperCase());
+        }
+
+    }
+}
+*/
+
+    public static void madLibs() {
+
+        int length = 12;
+        String[] wordArray = new String[length];
+
+        wordArray = blanks(length);
+        winterStory(wordArray, length);
+
+        playAgainMadlib();
+    }
+
+    public static String[] blanks(int length) {
+
+        Scanner userInput = new Scanner(System.in);
+
+        System.out.println("\nHello! Thank you for choosing our Winter Themed Madlibs game!\nYou will be asked to type out a variety " +
+                "of words in which you will get your own personalized story at the end! :) ");
+
+        String[] prompts = {"\nEnter a month: ", "Enter an emotion: ", "Enter a number: ", "Enter a place: ",
+                "Enter another emotion: ", "Enter a verb(action): ", "Enter a type of clothing attire: ", "Enter a type of beverage: ",
+                "Enter a type of food: ", "Enter a holiday song: ", "Enter a verb(action): ", "Finally. Enter a sport: "};
+
+        String[] userArray = new String[length];
+
+        for (int i = 0; i < length; i++) {
+            System.out.print(prompts[i]);
+            userArray[i] = userInput.nextLine();
+        }
+
+        return userArray;
+
+    }
+
+    public static void winterStory(String[] anArray, int length) {
+        String story = "\nOn a cold day in " + anArray[0] + "\nThere had been a ongoing snowstorm. \nThe students of Loyola felt "
+
+                + anArray[1] + " because school had been cancelled. \n" + "In particular, there are " + anArray[2] +
+
+                " inches of snow on the ground and many snowmen in sight on the quad. \nMany students at Loyola decided to head over to "
+
+                + anArray[3] + " to have fun on their day off. \nThe students when seeing the snow felt " + anArray[4] +
+
+                " and wanted to " + anArray[5] + ". \nThey were dressed up in " + anArray[6] + ", drank " + anArray[7] +
+
+                " and munched on " + anArray[8] + " to get warm." + "\nThey sung " + anArray[9] + " and " + anArray[10]
+
+                + " about the upcoming " + anArray[11] + " season. \nThese student will recall this winter day.";
+
+
+        System.out.println(story);
+    }
+
+    //Ask user if they want to play again or leave the program
+
+    public static void playAgainMadlib() {
+        /* user scanner to ask user if they would like to play again. */
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\nWould you like to play Madlibs again? Enter yes or no.\nInvalid input will automatically close game.");
+        String yes = "yes";
+        String no = "no";
+        String userInput = Console.nextLine();
+        /* Use if statements to determine if the user would like to exit or
+        to continue playing. Else will be used if the user enters an invalid
+        input. */
+        if (userInput.equals(yes.toUpperCase()) || userInput.equals(yes.toLowerCase())) { //trying to make it accept either lower or upper case input
+            madLibs(); //Takes to madlibs game.
+        } else if (userInput.equals(no.toUpperCase()) || userInput.equals(no.toLowerCase())) { //same thing here but opposite condition
+            System.out.println("Thanks for playing! Exiting game."); //Program ends
+        } else {
+            //program ends with invalid input.
+            System.out.println("Invalid input. Game closing automatically.");
+        }
+    }
+}
+
+
+
+
